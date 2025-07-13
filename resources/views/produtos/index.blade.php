@@ -1,41 +1,60 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Produtos</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
+@extends('layouts.app')
 
-    <div class="container mt-5">
-        <h1 class="mb-4">Nossos Produtos</h1>
+@section('title', 'Produtos')
 
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Produto</th>
-                    <th scope="col">Preço</th>
-                    <th scope="col">Categoria</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($produtos as $produto)
-                    <tr>
-                        <td>{{ $produto->id }}</td>
-                        <td>{{ $produto->nome }}</td>
-                        <td>{{ number_format($produto->preco, 2, ',', '.') }}</td>
-                        <td>{{ $produto->categoria?->nome}}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4">Nenhum produto cadastrado.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+@section('content')
+<div class="container mt-5">
+    <!-- Cabeçalho e Botão de Adicionar -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Nossos Produtos</h1>
+        <a href="{{ route('produtos.create') }}" class="btn btn-success">
+            + Novo Produto
+        </a>
     </div>
 
-</body>
-</html>
+    <!-- Tabela de Produtos -->
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Produto</th>
+                <th scope="col">Preço</th>
+                <th scope="col">Categoria</th>
+                <th scope="col" class="text-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($produtos as $produto)
+                <tr>
+                    <td>{{ $produto->id }}</td>
+                    <td>{{ $produto->nome }}</td>
+                    <td>R$ {{ number_format($produto->preco, 2, ',', '.') }}</td>
+                    <td>{{ $produto->categoria?->nome ?? '-' }}</td>
+                    <td class="text-center">
+                    
+                        <a href="{{ route('produtos.edit', $produto->id) }}" 
+                           class="btn btn-sm btn-warning" title="Editar">
+                            Editar
+                        </a>
+                        
+                       
+                        <form action="{{ route('produtos.destroy', $produto->id) }}" method="POST" style="display: inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-danger" 
+                                    title="Excluir"
+                                    onclick="return confirm('Tem certeza que deseja excluir?')">
+                                Excluir
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="5" class="text-center">Nenhum produto cadastrado.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+@endsection
